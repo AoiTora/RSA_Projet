@@ -34,10 +34,9 @@ public class Client {
              String msg;
               public void run() {
                 while(true){
-                  msg = sc.nextLine();
-                  //String chiffre=Chiffrement.chiffrer(msg).toString();
-                  //out.println(chiffre);
-                  out.flush();
+                	msg = sc.nextLine();
+                    out.println(msg);
+                    out.flush();
                 }
              }
          });
@@ -49,11 +48,13 @@ public class Client {
             public void run() {
                try {
             	   System.out.println("Bob est en ligne");
-                   msg = in.readLine().getBytes();
-                   //messageclair = Dechiffrement.dechiffrer(msg);
-                 while(msg!=null){
-                    System.out.println("Alice dit : "+msg);
-                    msg = in.readLine().getBytes();
+            	   messageclair = in.readLine();
+                   // msg = in.readLine().getBytes();
+                 //   messageclair = Dechiffrement.dechiffrer(msg);
+                 while(messageclair!=null){
+                    System.out.println("Bob dit : "+messageclair);
+                    messageclair = in.readLine();
+
                  }
                  System.out.println("Alice déconnectée");
                  out.close();

@@ -34,9 +34,8 @@ public class Server {
           String msg;
           public void run() {
              while(true){
-                 msg = sc.nextLine();
-                // String chiffre=Chiffrement.chiffrer(msg).toString();
-                // out.println(chiffre);
+            	 msg = sc.nextLine();
+                 out.println(msg);
                  out.flush();
              }
           }
@@ -44,16 +43,17 @@ public class Server {
        envoi.start();
 
        Thread recevoir= new Thread(new Runnable() {
-          byte[] msg ;
-          String messageclair;
+          //byte[] msg ;
+          String msg;
           public void run() {
              try {
           	   System.out.println("Alice est en ligne");
-               msg = in.readLine().getBytes();
+               msg = in.readLine();
+              // msg = in.readLine().getBytes();
             //   messageclair = Dechiffrement.dechiffrer(msg);
              while(msg!=null){
                 System.out.println("Alice dit : "+msg);
-                msg = in.readLine().getBytes();
+                msg = in.readLine();
              }
                 System.out.println("Déconnexion de Bob");
                 out.close();
