@@ -1,14 +1,5 @@
 package clefs;
 
-import java.security.KeyFactory;
-import java.security.PublicKey;
-import java.security.PrivateKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.RSAPublicKeySpec;
-import java.security.spec.RSAPrivateKeySpec;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-
 import java.io.IOException;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
@@ -20,130 +11,58 @@ import java.math.BigInteger;
 
 public class GestionClesRSA {
 
-    /**
-     * Sauvegarde de la clé publique dans un fichier.
-     * @param clePublique la clé publique
-     * @param nomFichier le nom du fichier dans lequel sauvegarder la clé
-     */
-    public static void sauvegardeClePublique(PublicKey clePublique, String nomFichier) {
-        RSAPublicKeySpec specification = null;
-        try {
-            KeyFactory usine = KeyFactory.getInstance("RSA");
-            specification = usine.getKeySpec(clePublique, RSAPublicKeySpec.class);
-        } catch(NoSuchAlgorithmException e) {
-            System.err.println("RSA inconnu : " + e);
-            System.exit(-1);
-        } catch(InvalidKeySpecException e) {
-            System.err.println("Clé incorrecte : " + e);
-            System.exit(-1);
-        }
+	/**
+	 * Sauvegarde d'une clé publique ou privée dans un fichier.
+	 * @param n BigInteger issue de n=p*q
+	 * @param x l'exposant, qu'il soit publique ou privé
+	 * @param nomFichier le nom du fichier dans lequel sauvegarder la clé
+	 */
+	public static void sauvegardeCle(BigInteger n, BigInteger x, String nomFichier, boolean verbose) {
+		try {
+			if(verbose) System.out.println("Ouverture du fichier "+nomFichier+" en écriture.");
+			ObjectOutputStream fichier=new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(nomFichier)));
+			if(verbose) System.out.println("Écriture du modulo.");
+			fichier.writeObject(n);
+			if(verbose) System.out.println("Écriture de l'exposant.");
+			fichier.writeObject(x);
+			if(verbose) System.out.println("Fermeture du fichier "+nomFichier+System.lineSeparator());
+			fichier.close();
+		} catch(IOException e) {
+			System.err.println("Erreur lors de la sauvegarde de la clé: "+e);
+			System.exit(-1);
+		}
+	}
 
-        try {
-            ObjectOutputStream fichier = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(nomFichier)));
-            fichier.writeObject(specification.getModulus());
-            fichier.writeObject(specification.getPublicExponent());
-            fichier.close();
-        } catch(IOException e) {
-            System.err.println("Erreur lors de la sauvegarde de la clé : " + e);
-            System.exit(-1);
-        }
-    }
-
-    /**
-     * Sauvegarde de la clé privée dans un fichier.
-     * @param clePublique la clé privée
-     * @param nomFichier le nom du fichier dans lequel sauvegarder la clé
-     */
-    public static void sauvegardeClePrivee(PrivateKey clePrivee, String nomFichier) {
-        RSAPrivateKeySpec specification = null;
-        try {
-            KeyFactory usine = KeyFactory.getInstance("RSA");
-            specification = usine.getKeySpec(clePrivee, RSAPrivateKeySpec.class);
-        } catch(NoSuchAlgorithmException e) {
-            System.err.println("Algorithme RSA inconnu : " + e);
-            System.exit(-1);
-        } catch(InvalidKeySpecException e) {
-            System.err.println("Clé incorrecte : " + e);
-            System.exit(-1);
-        }
-
-        try {
-            ObjectOutputStream fichier = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(nomFichier)));
-            fichier.writeObject(specification.getModulus());
-            fichier.writeObject(specification.getPrivateExponent());
-            fichier.close();
-        } catch(IOException e) {
-            System.err.println("Erreur lors de la sauvegarde de la clé : " + e);
-            System.exit(-1);
-        }
-    }
-
-    /**
-     * Lecture d'une clé privée depuis un fichier.
-     * @param nomFichier le nom du fichier contenant la clé privée
-     * @return la clé privée
-     */
-    public static PrivateKey lectureClePrivee(String nomFichier) {
-        BigInteger modulo = null, exposant = null;
-        try {
-            ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(nomFichier)));
-            modulo = (BigInteger) ois.readObject();
-            exposant = (BigInteger) ois.readObject();
-        } catch(IOException e) {
-            System.err.println("Erreur lors de la lecture de la clé : " + e);
-            System.exit(-1);
-        } catch(ClassNotFoundException e) {
-            System.err.println("Fichier de cle incorrect : " + e);
-            System.exit(-1);
-        }
-
-        PrivateKey clePrivee = null;
-        try {
-            RSAPrivateKeySpec specification = new RSAPrivateKeySpec(modulo, exposant);
-            KeyFactory usine = KeyFactory.getInstance("RSA");
-            clePrivee = usine.generatePrivate(specification);
-        } catch(NoSuchAlgorithmException e) {
-            System.err.println("Algorithme RSA inconnu : " + e);
-            System.exit(-1);
-        } catch(InvalidKeySpecException e) {
-            System.err.println("Spécification incorrecte : " + e);
-            System.exit(-1);
-        }
-        return clePrivee;
-    }
-
-    /**
-     * Lecture d'une clé publique depuis un fichier.
-     * @param nomFichier le nom du fichier contenant la clé publique
-     * @return la clé publique
-     */
-    public static PublicKey lectureClePublique(String nomFichier) {
-        BigInteger modulo = null, exposant = null;
-        try {
-            ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(nomFichier)));
-            modulo = (BigInteger) ois.readObject();
-            exposant = (BigInteger) ois.readObject();
-        } catch(IOException e) {
-            System.err.println("Erreur lors de la lecture de la clé : " + e);
-            System.exit(-1);
-        } catch(ClassNotFoundException e) {
-            System.err.println("Fichier de clé incorrect : " + e);
-            System.exit(-1);
-        }
-
-        PublicKey clePublique = null;
-        try {
-            RSAPublicKeySpec specification = new RSAPublicKeySpec(modulo, exposant);
-            KeyFactory usine = KeyFactory.getInstance("RSA");
-            clePublique = usine.generatePublic(specification);
-        } catch(NoSuchAlgorithmException e) {
-            System.err.println("Algorithme RSA inconnu : " + e);
-            System.exit(-1);
-        } catch(InvalidKeySpecException e) {
-            System.err.println("Spécification incorrecte : " + e);
-            System.exit(-1);
-        }
-        return clePublique;
-    }
-
+	/**
+	 * Lecture d'une clé publique ou privée depuis un fichier.
+	 * @param nomFichier le nom du fichier contenant une clé publique ou privé
+	 * @return BigInteger[] où index0=modulo, index1=exposant publique ou privé
+	 */
+	public static BigInteger[] lectureCle(String nomFichier, boolean verbose) {
+		BigInteger modulo=null, exposant=null;
+		try {
+			if(verbose) System.out.println("Ouverture du fichier "+nomFichier+" en lecture.");
+			ObjectInputStream ois=new ObjectInputStream(new BufferedInputStream(new FileInputStream(nomFichier)));
+			if(verbose) System.out.print("Lecture du modulo: ");
+			modulo=(BigInteger)ois.readObject();
+			if(verbose) {
+				System.out.println(modulo);
+				System.out.print("Lecture de l'exposant: ");
+			}
+			exposant=(BigInteger)ois.readObject();
+			if(verbose) {
+				System.out.println(exposant);
+				System.out.println("Fermeture du fichier "+nomFichier+System.lineSeparator());
+			}
+			ois.close();
+		} catch(IOException e) {
+			System.err.println("Erreur lors de la lecture de la clé: "+e);
+			System.exit(-1);
+		} catch(ClassNotFoundException e) {
+			System.err.println("Fichier de clé incorrect: "+e);
+			System.exit(-1);
+		}
+		BigInteger temp[]={modulo, exposant};
+		return temp;
+	}
 }
