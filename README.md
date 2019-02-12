@@ -8,7 +8,7 @@ Les programme sont des archives JAVA auto-exécutable qui devraient fonctionner 
 
 # Serveur
 
-Lancement: `./Serveur.jar [Numéro de port] [nombre de bit] [nom du fihier privée] [nom du fihier publique] [niveau de verbosité]`
+Lancement: `./Serveur.jar [Numéro de port] [nombre de bit] [nom du fichier privée] [nom du fichier publique] [niveau de verbosité]`
 
 __Liste des arguments optionnelles:__
   - numéro de port du serveur qui doit être supérieur à 1024. 5000 par défaut.
@@ -19,7 +19,7 @@ __Liste des arguments optionnelles:__
 
 # Client
 
-Lancement: `./Client.jar [Adresse] [Numéro de port] [nombre de bit] [nom du fihier privée] [nom du fihier publique] [niveau de verbosité]`
+Lancement: `./Client.jar [Adresse] [Numéro de port] [nombre de bit] [nom du fichier privée] [nom du fichier publique] [niveau de verbosité]`
 
 __Liste des arguments optionnelles:__
   - adresse du serveur. 127.0.0.1 par défaut.

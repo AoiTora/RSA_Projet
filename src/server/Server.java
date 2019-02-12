@@ -44,7 +44,7 @@ public class Server {
 			int portNumber=5000;
 			if(args.length>0) portNumber=Integer.parseInt(args[0]);
 			if(portNumber<1024) portNumber=5000;
-			final ServerSocket ss=new ServerSocket(portNumber, 0, InetAddress.getByName("localhost"));
+			final ServerSocket ss=new ServerSocket(portNumber, 0, InetAddress.getByName("0.0.0.0"));
 			System.out.println("Server running");
 			Socket s;
 			try {
