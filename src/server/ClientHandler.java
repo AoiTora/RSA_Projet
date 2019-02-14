@@ -59,11 +59,24 @@ class ClientHandler implements Runnable {
 						msg.clear();
 						System.out.println("Decrypted Message from client "+id+" is : "+messageClair);
 	
-						if(messageClair.equals("/logout")) disconnect();
-						else encryptAndSend(messageClair); // Reencrypting and sending the message
-	
 						if(messageClair.equals("/ping")) encryptAndSend("pong !");
 						else if(messageClair.equals("/up")) encryptAndSend("And down !");
+						else if(messageClair.startsWith("/send")) {
+							splitted=messageClair.split("=");
+							try {
+								if(splitted.length>=3) {
+									for(int i=3; i<splitted.length; i++) splitted[2]+=splitted[i];
+									if(Server.sendTo(id, Integer.parseInt(splitted[1]), splitted[2])!=null) encryptAndSend("Client unreachable !");
+								}
+								else encryptAndSend("Ex: /send=0=hello");
+							} catch(NumberFormatException e) {
+								encryptAndSend("Client number must be an integer !"+System.lineSeparator()+"Ex: /send=0=hello");
+							}
+						}
+						else if(messageClair.equals("/logout")) disconnect();
+						else if(messageClair.equals("/list")) encryptAndSend(Server.listExclude(id));
+						else if(messageClair.equals("/id")) encryptAndSend("You are client "+id);
+						else encryptAndSend(messageClair); // Reencrypting and sending the message
 					} catch(NumberFormatException ex) {}
 				}
 			}

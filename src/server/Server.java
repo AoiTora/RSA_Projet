@@ -100,7 +100,7 @@ public class Server {
 						else if(splitted.length>=2) {
 							try {
 								for(int i=2; i<splitted.length; i++) splitted[1]+=splitted[i];
-								sendTo(Integer.parseInt(splitted[0]), splitted[1]);
+								if(serverSend(Integer.parseInt(splitted[0]), splitted[1])!=null) System.err.println("Client unreachable !");
 							} catch(NumberFormatException e) {
 								System.err.println("Client number must be an integer !");
 							}
@@ -151,16 +151,35 @@ public class Server {
 		if(ac.containsKey(id)) ac.remove(id);
 	}
 
-	public static void sendTo(int id, String msg) {
-		if(ac.containsKey(id)) ac.get(id).encryptAndSend(msg);
-		else System.err.println("Client "+id+" unreachable !");
-	}
-
 	public static BigInteger[] getPublicKeys() {
 		return publicKeys;
 	}
 
 	public static BigInteger[] getPrivateKeys() {
 		return privateKeys;
+	}
+
+	private static String serverSend(int id, String msg) {
+		if(ac.containsKey(id)) {
+			ac.get(id).encryptAndSend("From server : "+msg);
+			return null;
+		}
+		else return "Client "+id+" is offline !";
+	}
+
+	public static String sendTo(int sender, int receiver, String msg) {
+		if(ac.containsKey(receiver)) {
+			ac.get(receiver).encryptAndSend("From "+sender+" : "+msg);
+			return null;
+		}
+		else return "Client "+receiver+" is offline !";
+	}
+
+	public static String listExclude(int id) {
+		String txt="There is no other client. Just you and the server...";
+		if(ac.size()>1) for(Integer i: ac.keySet()) {
+			if(i!=id) txt=System.lineSeparator()+"Client number "+i+" at address "+ac.get(i).getInetAdress()+System.lineSeparator();
+		}
+		return txt;
 	}
 }

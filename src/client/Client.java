@@ -23,6 +23,7 @@ public class Client {
 	static BigInteger[] serveurKeys;
 	static Boolean isLoggedIn;
 	static BigInteger[] privateKeys, publicKeys;
+	static String message="";
 
 	/**
 	 * Méthode principale.
@@ -77,12 +78,12 @@ public class Client {
 					@Override
 					public void run() {
 						while(true) {
-							String msg=scn.nextLine();
-							if(msg.equals("/keys")) {
+							message=scn.nextLine();
+							if(message.equals("/keys")) {
 								generateKeys(bitLength, privateFile, publicFile);
 								sendPublicKeys();
 							}
-							else encryptAndSend(msg);
+							else encryptAndSend(message);
 						}
 					}
 				});
@@ -107,20 +108,23 @@ public class Client {
 									String messageClair=Dechiffrement.dechiffrer(privateKeys, msg, verbose==2);
 									msg.clear();
 									System.out.println("Decrypted Message from server is : "+messageClair);
-									
-									
+
 									if(messageClair.startsWith("/keys=")) {
 										splitted=messageClair.split("=");
 										serveurKeys[0]=new BigInteger(splitted[1]);
 										serveurKeys[1]=new BigInteger(splitted[2]);
-									}		
-									else if(messageClair.equals("/ping")) encryptAndSend("pong !");
-									else if(messageClair.equals("/up")) encryptAndSend("And down !");
-									else if(messageClair.equals("/logout")) {
-										// Closing resources
-										s.close();
-										dis.close();
-										dos.close();
+									}
+									else {
+										if(messageClair.equals(message)) System.out.println("SUCCESS !");
+										else System.out.println("FAIL !");
+										if(messageClair.equals("/ping")) encryptAndSend("pong !");
+										else if(messageClair.equals("/up")) encryptAndSend("And down !");
+										else if(messageClair.equals("/logout")) {
+											// Closing resources
+											s.close();
+											dis.close();
+											dos.close();
+										}
 									}
 								} catch(NumberFormatException ex) {}
 							}
